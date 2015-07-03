@@ -23,7 +23,6 @@
     self.window.rootViewController = VC;
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
-    NSLog(@"222");
     return YES;
 }
 
