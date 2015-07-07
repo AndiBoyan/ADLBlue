@@ -1082,16 +1082,6 @@ updatingLocation:(BOOL)updatingLocation
             NSData *carCmdData = [characteristic.value subdataWithRange:NSMakeRange(8, 1)];
             if ([carCmdData isEqualToData:[self stringToByte:@"00"]]) {
                 //原车控制关闭
-                float h = [UIScreen mainScreen].bounds.size.height;
-                NSString *onImageName = [NSString stringWithFormat:@"ledON0-%.0f.png",h];
-                UIImage *onImage = [UIImage imageNamed:onImageName];
-                UIImage *onImageBtn = [onImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
-                [obsOnButton setBackgroundImage:onImageBtn forState:UIControlStateNormal];//定义背景图片
-                NSString *autoImageName = [NSString stringWithFormat:@"autoON-%.0f.png",h];
-                UIImage *aotuImage = [UIImage imageNamed:autoImageName];
-                UIImage *autoImageBtn = [aotuImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
-                [obsAutoButton setBackgroundImage:autoImageBtn forState:UIControlStateNormal];//定义背景图片
-                autoSelect = 0;
                 [readRSSITime setFireDate:[NSDate distantPast]];
 
                 vehicleControl = 0;
