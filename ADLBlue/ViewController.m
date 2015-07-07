@@ -312,7 +312,13 @@ updatingLocation:(BOOL)updatingLocation
     TLTiltSlider *slider = [[TLTiltSlider alloc]init];
     slider.minimumValue = 50;
     slider.maximumValue = 100;
-    slider.value = 75;
+    NSUserDefaults *periperalData = [NSUserDefaults standardUserDefaults];
+    NSString *rssi = [periperalData objectForKey:@"LastRSSI"];
+    slider.value = 50;
+    if (rssi != nil) {
+        slider.value = rssi.floatValue;
+    }
+    
     [slider addTarget:self action:@selector(updataValue:) forControlEvents:UIControlEventValueChanged];
     [settingView addSubview:slider];
     
@@ -362,13 +368,25 @@ updatingLocation:(BOOL)updatingLocation
     startTimeLab = [[UILabel alloc]init];
     startTimeLab.textAlignment = NSTextAlignmentCenter;
     startTimeLab.text = @"19:00 >";
+    NSUserDefaults *startData = [NSUserDefaults standardUserDefaults];
+    NSString *startTime = [startData objectForKey:@"StartTime"];
+    if (startTime != nil) {
+        startTimeLab.text = startTime;
+    }
+
     startTimeLab.font = [UIFont systemFontOfSize:13.0f];
     startTimeLab.textColor = [UIColor whiteColor];
     [timerImage addSubview:startTimeLab];
     
     endTimeLab = [[UILabel alloc]init];
     endTimeLab.textAlignment = NSTextAlignmentCenter;
-    endTimeLab.text = @"23:30 >";
+    endTimeLab.text = @"06:30 >";
+    NSUserDefaults *endData = [NSUserDefaults standardUserDefaults];
+    NSString *endTime = [endData objectForKey:@"EndTime"];
+    if (endTime != nil) {
+        endTimeLab.text = endTime;
+    }
+
     endTimeLab.font = [UIFont systemFontOfSize:13.0f];
     endTimeLab.textColor = [UIColor whiteColor];
     [timerImage addSubview:endTimeLab];
@@ -650,6 +668,9 @@ updatingLocation:(BOOL)updatingLocation
 {
     UISlider *slider = (UISlider*)sender;
     RSSIValue = slider.value;
+    NSString *rssi = [NSString stringWithFormat:@"%f",RSSIValue];
+    NSUserDefaults *defaultsData = [NSUserDefaults standardUserDefaults];
+    [defaultsData setObject:rssi forKey:@"LastRSSI"];
 }
 
 //时间设置开关
@@ -699,9 +720,13 @@ updatingLocation:(BOOL)updatingLocation
     NSString *string = [NSString stringWithFormat:@"%@:%@ >",firstString,subString];
     if (timeValue == 1) {
         startTimeLab.text = string;
+        NSUserDefaults *defaultsData = [NSUserDefaults standardUserDefaults];
+        [defaultsData setObject:string forKey:@"StartTime"];
     }
     if (timeValue == 2) {
         endTimeLab.text = string;
+        NSUserDefaults *defaultsData = [NSUserDefaults standardUserDefaults];
+        [defaultsData setObject:string forKey:@"EndTime"];
     }
     dateView.hidden = YES;
 }
@@ -804,6 +829,7 @@ updatingLocation:(BOOL)updatingLocation
         {
             [self.centralMgr scanForPeripheralsWithServices:nil options:nil];
             NSLog(@"这在寻找设备。。。");
+            bleConnectState = 0;
 
         }
         break;
@@ -841,7 +867,7 @@ updatingLocation:(BOOL)updatingLocation
 //保存设备信息
 - (BOOL)saveBLE:(BLEInfo *)discoveredBLEInfo
 {
-    for (BLEInfo *info in self.arrayBLE)
+    for (BLEInfo *info in self.bleAry)
     {
         if ([info.discoveredPeripheral.identifier.UUIDString isEqualToString:discoveredBLEInfo.discoveredPeripheral.identifier.UUIDString])
         {
@@ -910,18 +936,24 @@ updatingLocation:(BOOL)updatingLocation
     if (fabsf([peripheral.RSSI floatValue]) < RSSIValue ) {
         //处于感应区
         if (RSSIState != 1) {
-            
-          //  NSLog(@"RSSS:%d",RSSIState);
             RSSIState = 1;
-           // if ([self isBetweenFromHour:8 FromMinute:30 toHour:16 toMinute:00]&&isTunnel) {
+            NSUserDefaults *startData = [NSUserDefaults standardUserDefaults];
+            NSString *startTime = [startData objectForKey:@"StartTime"];
+            NSUserDefaults *endData = [NSUserDefaults standardUserDefaults];
+            NSString *endTime = [endData objectForKey:@"EndTime"];
+            int fromHour = [startTime substringToIndex:1].intValue;
+            int fromMin = [startTime substringWithRange:NSMakeRange(3, 2)].intValue;
+            int endHour = [endTime substringToIndex:1].intValue;
+            int endMin = [endTime substringWithRange:NSMakeRange(3, 2)].intValue;
+            if ([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]&&isTunnel) {
                 [self periperalCmd:@"F101010100" length:13];
-           /* }
-            if ([self isBetweenFromHour:8 FromMinute:30 toHour:16 toMinute:00]&&(isTunnel == NO)) {
+            }
+            if ([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]&&(isTunnel == NO)) {
                 [self periperalCmd:@"F101010000" length:13];
             }
-            if (([self isBetweenFromHour:8 FromMinute:30 toHour:16 toMinute:00]==NO)&&isTunnel) {
+            if (([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]==NO)&&isTunnel) {
                 [self periperalCmd:@"F100010100" length:13];
-            }*/
+            }
         }
     }
     if (fabsf([peripheral.RSSI floatValue]) > RSSIValue ) {
