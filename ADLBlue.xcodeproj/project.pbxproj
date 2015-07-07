@@ -83,8 +83,6 @@
 		305837A31B4123040037E0FC /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 305837A21B4123040037E0FC /* libz.dylib */; };
 		305837A51B41230B0037E0FC /* libstdc++.6.0.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 305837A41B41230B0037E0FC /* libstdc++.6.0.9.dylib */; };
 		305837A71B4123140037E0FC /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 305837A61B4123140037E0FC /* Security.framework */; };
-		30900DEC1B451C87003A3DB5 /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900DD91B451C87003A3DB5 /* 1.png */; };
-		30900DED1B451C87003A3DB5 /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900DDA1B451C87003A3DB5 /* 2.png */; };
 		30900DEE1B451C87003A3DB5 /* autoOFF-667@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900DDB1B451C87003A3DB5 /* autoOFF-667@2x.png */; };
 		30900DEF1B451C87003A3DB5 /* autoON-667@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900DDC1B451C87003A3DB5 /* autoON-667@2x.png */; };
 		30900DF01B451C87003A3DB5 /* back-667@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900DDD1B451C87003A3DB5 /* back-667@2x.png */; };
@@ -102,9 +100,6 @@
 		30900DFC1B451C87003A3DB5 /* settingico1-667@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900DE91B451C87003A3DB5 /* settingico1-667@2x.png */; };
 		30900DFD1B451C87003A3DB5 /* timerImage-667@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900DEA1B451C87003A3DB5 /* timerImage-667@2x.png */; };
 		30900DFE1B451C87003A3DB5 /* timerImage1-667@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900DEB1B451C87003A3DB5 /* timerImage1-667@2x.png */; };
-		30900E161B452B49003A3DB5 /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900E001B452B49003A3DB5 /* 1.png */; };
-		30900E171B452B49003A3DB5 /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900E011B452B49003A3DB5 /* 2.png */; };
-		30900E181B452B49003A3DB5 /* 320x480.PSD in Resources */ = {isa = PBXBuildFile; fileRef = 30900E021B452B49003A3DB5 /* 320x480.PSD */; };
 		30900E191B452B49003A3DB5 /* 320x480背景.psd in Resources */ = {isa = PBXBuildFile; fileRef = 30900E031B452B49003A3DB5 /* 320x480背景.psd */; };
 		30900E1A1B452B49003A3DB5 /* autoOFF-480@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900E041B452B49003A3DB5 /* autoOFF-480@2x.png */; };
 		30900E1B1B452B49003A3DB5 /* autoON-480@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 30900E051B452B49003A3DB5 /* autoON-480@2x.png */; };
@@ -226,8 +221,6 @@
 		305837A21B4123040037E0FC /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		305837A41B41230B0037E0FC /* libstdc++.6.0.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.0.9.dylib"; path = "usr/lib/libstdc++.6.0.9.dylib"; sourceTree = SDKROOT; };
 		305837A61B4123140037E0FC /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		30900DD91B451C87003A3DB5 /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
-		30900DDA1B451C87003A3DB5 /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
 		30900DDB1B451C87003A3DB5 /* autoOFF-667@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "autoOFF-667@2x.png"; sourceTree = "<group>"; };
 		30900DDC1B451C87003A3DB5 /* autoON-667@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "autoON-667@2x.png"; sourceTree = "<group>"; };
 		30900DDD1B451C87003A3DB5 /* back-667@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "back-667@2x.png"; sourceTree = "<group>"; };
@@ -245,9 +238,6 @@
 		30900DE91B451C87003A3DB5 /* settingico1-667@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "settingico1-667@2x.png"; sourceTree = "<group>"; };
 		30900DEA1B451C87003A3DB5 /* timerImage-667@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "timerImage-667@2x.png"; sourceTree = "<group>"; };
 		30900DEB1B451C87003A3DB5 /* timerImage1-667@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "timerImage1-667@2x.png"; sourceTree = "<group>"; };
-		30900E001B452B49003A3DB5 /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
-		30900E011B452B49003A3DB5 /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
-		30900E021B452B49003A3DB5 /* 320x480.PSD */ = {isa = PBXFileReference; lastKnownFileType = file; path = 320x480.PSD; sourceTree = "<group>"; };
 		30900E031B452B49003A3DB5 /* 320x480背景.psd */ = {isa = PBXFileReference; lastKnownFileType = file; path = "320x480背景.psd"; sourceTree = "<group>"; };
 		30900E041B452B49003A3DB5 /* autoOFF-480@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "autoOFF-480@2x.png"; sourceTree = "<group>"; };
 		30900E051B452B49003A3DB5 /* autoON-480@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "autoON-480@2x.png"; sourceTree = "<group>"; };
@@ -515,8 +505,6 @@
 			children = (
 				30900E2E1B453601003A3DB5 /* background-667h@2x.png */,
 				30900E2C1B453152003A3DB5 /* settingView-667@2x.png */,
-				30900DD91B451C87003A3DB5 /* 1.png */,
-				30900DDA1B451C87003A3DB5 /* 2.png */,
 				30900DDB1B451C87003A3DB5 /* autoOFF-667@2x.png */,
 				30900DDC1B451C87003A3DB5 /* autoON-667@2x.png */,
 				30900DDD1B451C87003A3DB5 /* back-667@2x.png */,
@@ -541,9 +529,6 @@
 		30900DFF1B452B49003A3DB5 /* 480 */ = {
 			isa = PBXGroup;
 			children = (
-				30900E001B452B49003A3DB5 /* 1.png */,
-				30900E011B452B49003A3DB5 /* 2.png */,
-				30900E021B452B49003A3DB5 /* 320x480.PSD */,
 				30900E031B452B49003A3DB5 /* 320x480背景.psd */,
 				30900E041B452B49003A3DB5 /* autoOFF-480@2x.png */,
 				30900E051B452B49003A3DB5 /* autoON-480@2x.png */,
@@ -616,6 +601,11 @@
 				TargetAttributes = {
 					305837511B40E8150037E0FC = {
 						CreatedOnToolsVersion = 6.3.1;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					3058376A1B40E8160037E0FC = {
 						CreatedOnToolsVersion = 6.3.1;
@@ -655,7 +645,6 @@
 				30900DFC1B451C87003A3DB5 /* settingico1-667@2x.png in Resources */,
 				30900DF61B451C87003A3DB5 /* ledOFF-667@2x.png in Resources */,
 				303734801B4245C300373BC2 /* autoOFF-568@2x.png in Resources */,
-				30900DED1B451C87003A3DB5 /* 2.png in Resources */,
 				30900E1B1B452B49003A3DB5 /* autoON-480@2x.png in Resources */,
 				30900DF21B451C87003A3DB5 /* ble4ON-667@2x.png in Resources */,
 				30900E201B452B49003A3DB5 /* carlightON-480@2x.png in Resources */,
@@ -663,7 +652,6 @@
 				303734DB1B43E57600373BC2 /* settingico1-736@3x.png in Resources */,
 				303734C71B43E14600373BC2 /* back-736@3x.png in Resources */,
 				30900E211B452B49003A3DB5 /* LED-OFF-1.png in Resources */,
-				30900E171B452B49003A3DB5 /* 2.png in Resources */,
 				303734D31B43E14600373BC2 /* timerImage1-736@3x.png in Resources */,
 				303734971B42877E00373BC2 /* switchoff-568@2x.png in Resources */,
 				303734911B4271AC00373BC2 /* settingico-568@2x.png in Resources */,
@@ -694,7 +682,6 @@
 				303734C81B43E14600373BC2 /* background-736h@3x.png in Resources */,
 				30900E1C1B452B49003A3DB5 /* back-480@2x.png in Resources */,
 				303734B31B4387C200373BC2 /* RESwitch.bundle in Resources */,
-				30900E181B452B49003A3DB5 /* 320x480.PSD in Resources */,
 				3037348B1B4245C300373BC2 /* lightico-568@2x.png in Resources */,
 				303734CA1B43E14600373BC2 /* ble4ON-736@3x.png in Resources */,
 				303734621B422B0800373BC2 /* 底部框@3x.png in Resources */,
@@ -727,7 +714,6 @@
 				30900DF41B451C87003A3DB5 /* carlightON-667@2x.png in Resources */,
 				30900E1E1B452B49003A3DB5 /* ble4ON-480@2x.png in Resources */,
 				30900E221B452B49003A3DB5 /* ledOFF-480@2x.png in Resources */,
-				30900DEC1B451C87003A3DB5 /* 1.png in Resources */,
 				303734CE1B43E14600373BC2 /* ledOFF1-736@3x.png in Resources */,
 				303734831B4245C300373BC2 /* background-568h@2x.png in Resources */,
 				303734C51B43E14600373BC2 /* autoOFF-736@3x.png in Resources */,
@@ -742,7 +728,6 @@
 				300112171B4124C300EE7D4F /* AMap.bundle in Resources */,
 				30900DF91B451C87003A3DB5 /* lightico-667@2x.png in Resources */,
 				30900DFB1B451C87003A3DB5 /* settingico-667@2x.png in Resources */,
-				30900E161B452B49003A3DB5 /* 1.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

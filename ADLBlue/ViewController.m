@@ -12,14 +12,15 @@
 #import "OBShapedButton.h"
 #import "TLTiltSlider.h"
 #import "RESwitch.h"
+#import "BLEInfo.h"
 
 
-@interface ViewController ()<MAMapViewDelegate,AMapSearchDelegate,UIPickerViewDelegate,UIPickerViewDataSource>
+@interface ViewController ()<MAMapViewDelegate,AMapSearchDelegate,UIPickerViewDelegate,UIPickerViewDataSource,UITableViewDataSource,UITableViewDelegate>
 {
     MAMapView *_mapView;
     AMapSearchAPI *_search;
     UIImageView *carStateIV;
-    UIImageView *bleStateIV;
+    OBShapedButton *obsBleStateButton;
     OBShapedButton *obsAutoButton;
     OBShapedButton *obsOnButton;
     
@@ -50,7 +51,13 @@
     float lastlat;
     float lastlon;
     BOOL isTunnel;
+    
+    int bleConnectState;
 }
+
+@property UITableView *bletableView;
+@property NSMutableArray *bleAry;
+@property UIAlertView *bleAlertView;
 
 @end
 
@@ -84,6 +91,8 @@
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     tunnelTime = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(tunnel) userInfo:nil repeats:YES];
     [tunnelTime setFireDate:[NSDate distantFuture]];
+    
+    self.bleAry = [[NSMutableArray alloc]init];
 }
 
 -(void)tunnel
@@ -139,8 +148,8 @@ updatingLocation:(BOOL)updatingLocation
         }
     }
 }
-#pragma mark - calculate distance  根据2个经纬度计算距离
 
+#pragma mark - calculate distance  根据2个经纬度计算距离
 
 -(double) LantitudeLongitudeDist:(double)lon1 other_Lat:(double)lat1 self_Lon:(double)lon2 self_Lat:(double)lat2{
     double er = 6378137; // 6378700.0f;
@@ -241,10 +250,15 @@ updatingLocation:(BOOL)updatingLocation
     [obsAutoButton addTarget:self action:@selector(obsAutoButtonAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:obsAutoButton];
     
-    bleStateIV = [[UIImageView alloc]init];
-    NSString *bleImageName = [NSString stringWithFormat:@"ble4OFF-%.0f.png",h];
-    bleStateIV.image = [UIImage imageNamed:bleImageName];
-    [self.view addSubview:bleStateIV];
+    obsBleStateButton = [OBShapedButton buttonWithType:UIButtonTypeCustom];
+    NSString *bleStateImageName = [NSString stringWithFormat:@"ble4OFF-%.0f.png",h];
+    UIImage *bleStateImage = [UIImage imageNamed:bleStateImageName];
+    UIImage *bleStateImageBtn = [bleStateImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+    [obsBleStateButton setBackgroundImage:bleStateImageBtn forState:UIControlStateNormal];//定义背景图片
+    obsBleStateButton.backgroundColor = [UIColor clearColor];
+    [obsBleStateButton addTarget:self action:@selector(searchBle:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:obsBleStateButton];
+
     
     controlBtn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     controlBtn.tag = 1000;
@@ -408,7 +422,7 @@ updatingLocation:(BOOL)updatingLocation
         obsOffButton.frame = CGRectMake(234, 315, 62, 62);
         obsAutoButton.frame = CGRectMake(113.5, 300, 95, 95);
         
-        bleStateIV.frame = CGRectMake(20, 65, 36, 36);
+        obsBleStateButton.frame = CGRectMake(20, 65, 36, 36);
         controlBtn.frame = CGRectMake(30, 440, 100, 25);
         controlBtnIV.frame = CGRectMake(37.5, 0, 23, 23);
         controlLab.frame = CGRectMake(30, 460, 100, 20);
@@ -441,7 +455,7 @@ updatingLocation:(BOOL)updatingLocation
         obsOnButton.frame = CGRectMake(25, 380, 66, 66);
         obsOffButton.frame = CGRectMake(229, 380, 66, 66);
         obsAutoButton.frame = CGRectMake(103.5, 360, 113, 113);
-        bleStateIV.frame = CGRectMake(25, 70, 30, 30);
+        obsBleStateButton.frame = CGRectMake(25, 70, 30, 30);
         controlBtn.frame = CGRectMake(30, 520, 100, 25);
         controlBtnIV.frame = CGRectMake(37.5, 0, 25, 25);
         controlLab.frame = CGRectMake(30, 545, 100, 20);
@@ -467,7 +481,7 @@ updatingLocation:(BOOL)updatingLocation
         obsOnButton.frame = CGRectMake(24, 470, 80, 80);
         obsOffButton.frame = CGRectMake(271, 470, 80, 80);
         obsAutoButton.frame = CGRectMake(128, 450, 119, 119);
-        bleStateIV.frame = CGRectMake(25, 70, 37, 37);
+        obsBleStateButton.frame = CGRectMake(25, 70, 37, 37);
         controlBtn.frame = CGRectMake(44, 620, 100, 25);
         controlBtnIV.frame = CGRectMake(37.5, 0, 27.5, 27.5);
         controlLab.frame = CGRectMake(44, 645, 100, 20);
@@ -501,7 +515,7 @@ updatingLocation:(BOOL)updatingLocation
         obsOnButton.frame = CGRectMake(50, 500, 73, 73);
         obsOffButton.frame = CGRectMake(291, 500, 73, 73);
         obsAutoButton.frame = CGRectMake(144.5, 480, 125, 125);
-        bleStateIV.frame = CGRectMake(35, 85, 41, 41);
+        obsBleStateButton.frame = CGRectMake(35, 85, 41, 41);
         
         controlBtn.frame = CGRectMake(53.5, 680, 100, 25);
         controlBtnIV.frame = CGRectMake(37.5, 0, 25, 25);
@@ -579,6 +593,25 @@ updatingLocation:(BOOL)updatingLocation
         UIImage *autoImageBtn = [aotuImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
         [obsAutoButton setBackgroundImage:autoImageBtn forState:UIControlStateNormal];//定义背景图片
         [readRSSITime setFireDate:[NSDate distantPast]];
+    }
+}
+
+//搜索蓝牙设备
+-(void)searchBle:(id)sender
+{
+    if (bleConnectState == 1) {
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"当前设备不支持蓝牙4.0或者蓝牙未打开" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
+    else
+    {
+        self.bleAlertView = [[UIAlertView alloc] initWithTitle:@"搜索蓝牙设备" message:@"蓝牙设备" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:nil, nil];
+        self.bletableView = [[UITableView alloc] initWithFrame:CGRectMake(5.0, 0.0, 200.0, 150.0) style:UITableViewStylePlain];
+        self.bletableView.delegate=self;
+        self.bletableView.dataSource = self;
+        [self.bleAlertView setValue:self.bletableView forKey:@"accessoryView"];
+        [self.bleAlertView show];
     }
 }
 
@@ -777,6 +810,7 @@ updatingLocation:(BOOL)updatingLocation
         default:
         {
             NSLog(@"蓝牙未开启或当前设备不支持蓝牙4.0");
+            bleConnectState = 1;
         }
         break;
     }
@@ -785,13 +819,42 @@ updatingLocation:(BOOL)updatingLocation
 //发现设备delegate
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
 {
-    if ([peripheral.name isEqualToString:@"ADL-579"]) {
+    
+    NSUserDefaults *periperalData = [NSUserDefaults standardUserDefaults];
+    NSString *uuidString = [periperalData objectForKey:@"UUID"];
+    
+    BLEInfo *discoveredBLEInfo = [[BLEInfo alloc] init];
+    discoveredBLEInfo.discoveredPeripheral = peripheral;
+    discoveredBLEInfo.rssi = RSSI;
+    
+    // update tableview
+    [self saveBLE:discoveredBLEInfo];
+
+    if ([peripheral.name isEqualToString:@"ADL-579"]&&[peripheral.identifier.UUIDString isEqualToString:uuidString]) {
         self.centralMgr.delegate = self;
         self.discoveredPeripheral=peripheral;
         [self.centralMgr connectPeripheral:peripheral
                                    options:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES]
                                     forKey:CBConnectPeripheralOptionNotifyOnDisconnectionKey]];
     }
+}
+//保存设备信息
+- (BOOL)saveBLE:(BLEInfo *)discoveredBLEInfo
+{
+    for (BLEInfo *info in self.arrayBLE)
+    {
+        if ([info.discoveredPeripheral.identifier.UUIDString isEqualToString:discoveredBLEInfo.discoveredPeripheral.identifier.UUIDString])
+        {
+            return NO;
+        }
+    }
+    
+    NSLog(@"\nDiscover New Devices!\n");
+    NSLog(@"BLEInfo\n UUID：%@\n RSSI:%@\n\n",discoveredBLEInfo.discoveredPeripheral.identifier.UUIDString,discoveredBLEInfo.rssi);
+    
+    [self.bleAry addObject:discoveredBLEInfo];
+    [self.bletableView reloadData];
+    return YES;
 }
 
 //退出蓝牙
@@ -804,23 +867,32 @@ updatingLocation:(BOOL)updatingLocation
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
     float h = [UIScreen mainScreen].bounds.size.height;
-    NSString *bleImageName = [NSString stringWithFormat:@"ble4OFF-%.0f.png",h];
-    bleStateIV.image = [UIImage imageNamed:bleImageName];
-    NSLog(@"didFailToConnectPeripheral : %@", error.localizedDescription);
+    NSString *bleStateImageName = [NSString stringWithFormat:@"ble4OFF-%.0f.png",h];
+    UIImage *bleStateImage = [UIImage imageNamed:bleStateImageName];
+    UIImage *bleStateImageBtn = [bleStateImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+    [obsAutoButton setBackgroundImage:bleStateImageBtn forState:UIControlStateNormal];//定义背景图片
 }
 
 //连接成功
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
     float h = [UIScreen mainScreen].bounds.size.height;
-    NSString *bleImageName = [NSString stringWithFormat:@"ble4ON-%.0f.png",h];
-    bleStateIV.image = [UIImage imageNamed:bleImageName];
+    NSString *bleStateImageName = [NSString stringWithFormat:@"ble4ON-%.0f.png",h];
+    UIImage *bleStateImage = [UIImage imageNamed:bleStateImageName];
+    UIImage *bleStateImageBtn = [bleStateImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+    [obsBleStateButton setBackgroundImage:bleStateImageBtn forState:UIControlStateNormal];//定义背景图片
     [_discoveredPeripheral setDelegate:self];
     [_discoveredPeripheral discoverServices:nil];
+    
     readRSSITime = [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(detectRSSI) userInfo:nil repeats:YES];
 }
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
+    float h = [UIScreen mainScreen].bounds.size.height;
+    NSString *bleStateImageName = [NSString stringWithFormat:@"ble4OFF-%.0f.png",h];
+    UIImage *bleStateImage = [UIImage imageNamed:bleStateImageName];
+    UIImage *bleStateImageBtn = [bleStateImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+    [obsBleStateButton setBackgroundImage:bleStateImageBtn forState:UIControlStateNormal];//定义背景图片
     if (_discoveredPeripheral)
     {
         NSLog(@"connectPeripheral");
@@ -839,24 +911,24 @@ updatingLocation:(BOOL)updatingLocation
         //处于感应区
         if (RSSIState != 1) {
             
-            NSLog(@"RSSS:%d",RSSIState);
+          //  NSLog(@"RSSS:%d",RSSIState);
             RSSIState = 1;
-            if ([self isBetweenFromHour:8 FromMinute:30 toHour:16 toMinute:00]&&isTunnel) {
+           // if ([self isBetweenFromHour:8 FromMinute:30 toHour:16 toMinute:00]&&isTunnel) {
                 [self periperalCmd:@"F101010100" length:13];
-            }
+           /* }
             if ([self isBetweenFromHour:8 FromMinute:30 toHour:16 toMinute:00]&&(isTunnel == NO)) {
                 [self periperalCmd:@"F101010000" length:13];
             }
             if (([self isBetweenFromHour:8 FromMinute:30 toHour:16 toMinute:00]==NO)&&isTunnel) {
                 [self periperalCmd:@"F100010100" length:13];
-            }
+            }*/
         }
     }
     if (fabsf([peripheral.RSSI floatValue]) > RSSIValue ) {
         //离开感应区
         if (RSSIState == 1) {
             RSSIState = 0;
-            NSLog(@"RSSS:%d",RSSIState);
+           // NSLog(@"RSSS:%d",RSSIState);
             [self periperalCmd:@"F100000000" length:13];
         }
     }
@@ -892,6 +964,8 @@ updatingLocation:(BOOL)updatingLocation
         if([c.UUID isEqual:[CBUUID UUIDWithString:@"FFE1"]]){
             self.writeCharacteristic = c;
             [_discoveredPeripheral setNotifyValue:YES forCharacteristic:c];
+            NSUserDefaults *defaultsData = [NSUserDefaults standardUserDefaults];
+            [defaultsData setObject:peripheral.identifier.UUIDString forKey:@"UUID"];
         }
     }
 }
@@ -1014,6 +1088,9 @@ updatingLocation:(BOOL)updatingLocation
     }
     NSUserDefaults *periperalData = [NSUserDefaults standardUserDefaults];
     NSData *data = [periperalData objectForKey:@"periperalID"];
+    if (data.length <= 0) {
+        return;
+    }
     NSData *stateData = [self stringToByte:state];
     Byte *byte = (Byte*)[data bytes];
     Byte *byte1 = (Byte*)[stateData bytes];
@@ -1057,6 +1134,9 @@ updatingLocation:(BOOL)updatingLocation
     }
     NSUserDefaults *periperalData = [NSUserDefaults standardUserDefaults];
     NSData *data = [periperalData objectForKey:@"periperalID"];
+    if (data.length <= 0) {
+        return;
+    }
     int length = 13;
     Byte *byte = (Byte*)[data bytes];
     Byte carByte[length];
@@ -1098,6 +1178,38 @@ updatingLocation:(BOOL)updatingLocation
     NSLog(@"写入数据成功:%@",characteristic);
 }
 
+#pragma mark tableView
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.bleAry.count;
+}
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"dequcell"];
+        BLEInfo *thisBLEInfo=[self.bleAry objectAtIndex:indexPath.row];
+        cell.textLabel.text=[NSString stringWithFormat:@"%@ %@",thisBLEInfo.discoveredPeripheral.name,thisBLEInfo.rssi];
+        cell.detailTextLabel.text=[NSString stringWithFormat:@"UUID:%@",thisBLEInfo.discoveredPeripheral.identifier.UUIDString];
+    }
+    return cell;
+}
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.discoveredPeripheral != nil)
+    {
+        NSLog(@"disConnect start");
+        [self.centralMgr cancelPeripheralConnection:self.discoveredPeripheral];
+    }
+    [self.bleAlertView dismissWithClickedButtonIndex:0 animated:YES];//触发dismiss
+    BLEInfo *thisBLEInfo=[self.bleAry objectAtIndex:indexPath.row];
+    self.centralMgr.delegate = self;
+    self.discoveredPeripheral=thisBLEInfo.discoveredPeripheral;
+    [self.centralMgr connectPeripheral:thisBLEInfo.discoveredPeripheral
+                               options:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES]
+                                                                   forKey:CBConnectPeripheralOptionNotifyOnDisconnectionKey]];
+
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
