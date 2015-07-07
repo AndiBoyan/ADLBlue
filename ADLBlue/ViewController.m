@@ -621,7 +621,29 @@ updatingLocation:(BOOL)updatingLocation
     else
     {
        autoSelect = 0;
-        [self periperalCmd:@"F100000000" length:13];
+        NSUserDefaults *startData = [NSUserDefaults standardUserDefaults];
+        NSString *startTime = [startData objectForKey:@"StartTime"];
+        if (startTime == nil) {
+            return;
+        }
+        NSUserDefaults *endData = [NSUserDefaults standardUserDefaults];
+        NSString *endTime = [endData objectForKey:@"EndTime"];
+        if (endTime == nil) {
+            return;
+        }
+        int fromHour = [startTime substringToIndex:1].intValue;
+        int fromMin = [startTime substringWithRange:NSMakeRange(3, 2)].intValue;
+        int endHour = [endTime substringToIndex:1].intValue;
+        int endMin = [endTime substringWithRange:NSMakeRange(3, 2)].intValue;
+        if ([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]&&isTunnel) {
+            [self periperalCmd:@"F101010100" length:13];
+        }
+        if ([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]&&(isTunnel == NO)) {
+            [self periperalCmd:@"F101010000" length:13];
+        }
+        if (([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]==NO)&&isTunnel) {
+            [self periperalCmd:@"F100010100" length:13];
+        }
         NSString *autoImageName = [NSString stringWithFormat:@"autoON-%.0f.png",h];
         UIImage *aotuImage = [UIImage imageNamed:autoImageName];
         UIImage *autoImageBtn = [aotuImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
