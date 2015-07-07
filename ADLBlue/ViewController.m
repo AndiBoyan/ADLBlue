@@ -70,7 +70,7 @@
 - (void)viewDidLoad {
     lastlat = 0.0f;
     lastlon = 0.0f;
-    [self isBetweenFromHour:14 FromMinute:00 toHour:10 toMinute:00];
+   // [self isBetweenFromHour:14 FromMinute:00 toHour:10 toMinute:00];
     [super viewDidLoad];
     [self initData];
     [self initView];
@@ -631,9 +631,9 @@ updatingLocation:(BOOL)updatingLocation
         if (endTime == nil) {
             return;
         }
-        int fromHour = [startTime substringToIndex:1].intValue;
+        int fromHour = [startTime substringWithRange:NSMakeRange(0, 2)].intValue;
         int fromMin = [startTime substringWithRange:NSMakeRange(3, 2)].intValue;
-        int endHour = [endTime substringToIndex:1].intValue;
+        int endHour = [endTime substringWithRange:NSMakeRange(0, 2)].intValue;
         int endMin = [endTime substringWithRange:NSMakeRange(3, 2)].intValue;
         if ([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]&&isTunnel) {
             [self periperalCmd:@"F101010100" length:13];
@@ -792,8 +792,9 @@ updatingLocation:(BOOL)updatingLocation
     }
     if ([currentDate compare:date8]!=NSOrderedDescending || [currentDate compare:date23]!=NSOrderedAscending) {
         if (isSwap == YES) {
+            return YES;
         }
-        return YES;
+        
     }
     return NO;
 }
@@ -873,6 +874,13 @@ updatingLocation:(BOOL)updatingLocation
         break;
         default:
         {
+            float h = [UIScreen mainScreen].bounds.size.height;
+            NSString *bleStateImageName = [NSString stringWithFormat:@"ble4OFF-%.0f.png",h];
+            UIImage *bleStateImage = [UIImage imageNamed:bleStateImageName];
+            UIImage *bleStateImageBtn = [bleStateImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+            [obsBleStateButton setBackgroundImage:bleStateImageBtn forState:UIControlStateNormal];//定义背景图片
+            NSString *stateImageName = [NSString stringWithFormat:@"carlightOFF-%.0f@2x",h];
+            carStateIV.image = [UIImage imageNamed:stateImageName];
             NSLog(@"蓝牙未开启或当前设备不支持蓝牙4.0");
             bleConnectState = 1;
         }
@@ -924,7 +932,7 @@ updatingLocation:(BOOL)updatingLocation
 //退出蓝牙
 -(void)viewWillDisappear:(BOOL)animated{
     
-    [self.centralMgr cancelPeripheralConnection:_discoveredPeripheral];
+   // [self.centralMgr cancelPeripheralConnection:_discoveredPeripheral];
 }
 
 //连接失败
@@ -957,6 +965,8 @@ updatingLocation:(BOOL)updatingLocation
     UIImage *bleStateImage = [UIImage imageNamed:bleStateImageName];
     UIImage *bleStateImageBtn = [bleStateImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
     [obsBleStateButton setBackgroundImage:bleStateImageBtn forState:UIControlStateNormal];//定义背景图片
+    NSString *stateImageName = [NSString stringWithFormat:@"carlightOFF-%.0f@2x",h];
+    carStateIV.image = [UIImage imageNamed:stateImageName];
     if (_discoveredPeripheral)
     {
         NSLog(@"connectPeripheral");
@@ -979,9 +989,9 @@ updatingLocation:(BOOL)updatingLocation
             NSString *startTime = [startData objectForKey:@"StartTime"];
             NSUserDefaults *endData = [NSUserDefaults standardUserDefaults];
             NSString *endTime = [endData objectForKey:@"EndTime"];
-            int fromHour = [startTime substringToIndex:1].intValue;
+            int fromHour = [startTime substringWithRange:NSMakeRange(0, 2)].intValue;
             int fromMin = [startTime substringWithRange:NSMakeRange(3, 2)].intValue;
-            int endHour = [endTime substringToIndex:1].intValue;
+            int endHour = [endTime substringWithRange:NSMakeRange(0, 2)].intValue;
             int endMin = [endTime substringWithRange:NSMakeRange(3, 2)].intValue;
             if ([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]&&isTunnel) {
                 [self periperalCmd:@"F101010100" length:13];
@@ -1046,9 +1056,9 @@ updatingLocation:(BOOL)updatingLocation
             if (endTime == nil) {
                 return;
             }
-            int fromHour = [startTime substringToIndex:1].intValue;
+            int fromHour = [startTime substringWithRange:NSMakeRange(0, 2)].intValue;
             int fromMin = [startTime substringWithRange:NSMakeRange(3, 2)].intValue;
-            int endHour = [endTime substringToIndex:1].intValue;
+            int endHour = [endTime substringWithRange:NSMakeRange(0, 2)].intValue;
             int endMin = [endTime substringWithRange:NSMakeRange(3, 2)].intValue;
             if ([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]&&isTunnel) {
                 [self periperalCmd:@"F101010100" length:13];
