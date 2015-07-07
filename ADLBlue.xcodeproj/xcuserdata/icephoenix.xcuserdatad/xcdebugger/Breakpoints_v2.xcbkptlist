@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ADLBlue/ViewController.m"
-            timestampString = "457931296.406134"
+            timestampString = "457946311.052475"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "936"
-            endingLineNumber = "936"
+            startingLineNumber = "952"
+            endingLineNumber = "952"
             landmarkName = "-peripheralDidUpdateRSSI:error:"
             landmarkType = "5">
          </BreakpointContent>

@@ -53,6 +53,7 @@
     BOOL isTunnel;
     
     int bleConnectState;
+    int vehicleControl;
 }
 
 @property UITableView *bletableView;
@@ -570,6 +571,11 @@ updatingLocation:(BOOL)updatingLocation
 //开灯指令
 -(void)obsOnButtonAction:(id)sender
 {
+    if (vehicleControl == 1) {
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"原车控制已开启，无法控制汽车" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
     [self periperalCmd:@"F301" length:10];
     float h = [UIScreen mainScreen].bounds.size.height;
     NSString *autoImageName = [NSString stringWithFormat:@"ledON0-%.0f.png",h];
@@ -581,6 +587,11 @@ updatingLocation:(BOOL)updatingLocation
 //关灯指令
 -(void)obsOffButtonAction:(id)sender
 {
+    if (vehicleControl == 1) {
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"原车控制已开启，无法控制汽车" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
     [self periperalCmd:@"F300" length:10];
     float h = [UIScreen mainScreen].bounds.size.height;
     NSString *autoImageName = [NSString stringWithFormat:@"ledON1-%.0f.png",h];
@@ -592,6 +603,11 @@ updatingLocation:(BOOL)updatingLocation
 //auto指令
 -(void)obsAutoButtonAction:(id)sender
 {
+    if (vehicleControl == 1) {
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"原车控制已开启，无法控制汽车" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
     float h = [UIScreen mainScreen].bounds.size.height;
     if (autoSelect == 0) {
         [self periperalCmd:@"F100000001" length:13];
@@ -998,6 +1014,29 @@ updatingLocation:(BOOL)updatingLocation
             [_discoveredPeripheral setNotifyValue:YES forCharacteristic:c];
             NSUserDefaults *defaultsData = [NSUserDefaults standardUserDefaults];
             [defaultsData setObject:peripheral.identifier.UUIDString forKey:@"UUID"];
+            NSUserDefaults *startData = [NSUserDefaults standardUserDefaults];
+            NSString *startTime = [startData objectForKey:@"StartTime"];
+            if (startTime == nil) {
+                return;
+            }
+            NSUserDefaults *endData = [NSUserDefaults standardUserDefaults];
+            NSString *endTime = [endData objectForKey:@"EndTime"];
+            if (endTime == nil) {
+                return;
+            }
+            int fromHour = [startTime substringToIndex:1].intValue;
+            int fromMin = [startTime substringWithRange:NSMakeRange(3, 2)].intValue;
+            int endHour = [endTime substringToIndex:1].intValue;
+            int endMin = [endTime substringWithRange:NSMakeRange(3, 2)].intValue;
+            if ([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]&&isTunnel) {
+                [self periperalCmd:@"F101010100" length:13];
+            }
+            if ([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]&&(isTunnel == NO)) {
+                [self periperalCmd:@"F101010000" length:13];
+            }
+            if (([self isBetweenFromHour:fromHour FromMinute:fromMin toHour:endHour toMinute:endMin]==NO)&&isTunnel) {
+                [self periperalCmd:@"F100010100" length:13];
+            }
         }
     }
 }
@@ -1043,11 +1082,34 @@ updatingLocation:(BOOL)updatingLocation
             NSData *carCmdData = [characteristic.value subdataWithRange:NSMakeRange(8, 1)];
             if ([carCmdData isEqualToData:[self stringToByte:@"00"]]) {
                 //原车控制关闭
-                NSLog(@"3");
+                float h = [UIScreen mainScreen].bounds.size.height;
+                NSString *onImageName = [NSString stringWithFormat:@"ledON0-%.0f.png",h];
+                UIImage *onImage = [UIImage imageNamed:onImageName];
+                UIImage *onImageBtn = [onImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+                [obsOnButton setBackgroundImage:onImageBtn forState:UIControlStateNormal];//定义背景图片
+                NSString *autoImageName = [NSString stringWithFormat:@"autoON-%.0f.png",h];
+                UIImage *aotuImage = [UIImage imageNamed:autoImageName];
+                UIImage *autoImageBtn = [aotuImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+                [obsAutoButton setBackgroundImage:autoImageBtn forState:UIControlStateNormal];//定义背景图片
+                autoSelect = 0;
+                [readRSSITime setFireDate:[NSDate distantPast]];
+
+                vehicleControl = 0;
             }
             if ([carCmdData isEqualToData:[self stringToByte:@"01"]]) {
                 //原车控制打开 无法控制
-                NSLog(@"4");
+                float h = [UIScreen mainScreen].bounds.size.height;
+                NSString *onImageName = [NSString stringWithFormat:@"ledON1-%.0f.png",h];
+                UIImage *onImage = [UIImage imageNamed:onImageName];
+                UIImage *onImageBtn = [onImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+                [obsOnButton setBackgroundImage:onImageBtn forState:UIControlStateNormal];//定义背景图片
+                NSString *autoImageName = [NSString stringWithFormat:@"autoOFF-%.0f.png",h];
+                UIImage *aotuImage = [UIImage imageNamed:autoImageName];
+                UIImage *autoImageBtn = [aotuImage stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+                [obsAutoButton setBackgroundImage:autoImageBtn forState:UIControlStateNormal];//定义背景图片
+                autoSelect = 1;
+                [readRSSITime setFireDate:[NSDate distantFuture]];
+                vehicleControl = 1;
             }
             /*NSData *carPowerData = [characteristic.value subdataWithRange:NSMakeRange(9, 1)];
              if ([carPowerData isEqualToData:[self stringToByte:@"00"]]) {
@@ -1201,7 +1263,7 @@ updatingLocation:(BOOL)updatingLocation
     carByte[length-2] = byte2[0];
     carByte[length-1] = byte2[1];
     NSData *msgdata = [NSData dataWithBytes:carByte length:length];
-    NSLog(@"%@",msgdata);
+    NSLog(@"1111:%@",msgdata);
     [_discoveredPeripheral writeValue:msgdata forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithoutResponse];
 }
 
