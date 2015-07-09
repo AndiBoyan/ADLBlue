@@ -54,6 +54,7 @@
     
     int bleConnectState;
     int vehicleControl;
+    int bleSetDone;
 }
 
 @property UITableView *bletableView;
@@ -68,8 +69,10 @@
 #define PI 3.1415926
 
 - (void)viewDidLoad {
+   
     lastlat = 0.0f;
     lastlon = 0.0f;
+    bleSetDone = 0;
    // [self isBetweenFromHour:14 FromMinute:00 toHour:10 toMinute:00];
     [super viewDidLoad];
     [self initData];
@@ -957,6 +960,13 @@ updatingLocation:(BOOL)updatingLocation
     [_discoveredPeripheral discoverServices:nil];
     
     readRSSITime = [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(detectRSSI) userInfo:nil repeats:YES];
+    /*dispatch_async(dispatch_get_main_queue(), ^{
+        readRSSITime = [NSTimer scheduledTimerWithTimeInterval:2.0
+                                                      target:self
+                                                    selector:@selector(detectRSSI)
+                                                    userInfo:nil
+                                                     repeats:YES];    });*/
+
 }
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
@@ -973,6 +983,7 @@ updatingLocation:(BOOL)updatingLocation
         [_centralMgr connectPeripheral:_discoveredPeripheral options:nil];
     }
 }
+
 #pragma mark 智能感应
 
 //读取RSSI数据
@@ -981,6 +992,7 @@ updatingLocation:(BOOL)updatingLocation
     [_discoveredPeripheral readRSSI];
 }
 - (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(NSError *)error {
+    NSLog(@"%f",fabsf([peripheral.RSSI floatValue]));
     if (fabsf([peripheral.RSSI floatValue]) < RSSIValue ) {
         //处于感应区
         if (RSSIState != 1) {
@@ -1010,6 +1022,9 @@ updatingLocation:(BOOL)updatingLocation
             RSSIState = 0;
            // NSLog(@"RSSS:%d",RSSIState);
             [self periperalCmd:@"F100000000" length:13];
+            if (vehicleControl == 1) {
+                [self notification:@"原车控制打开，离开感应区"];
+            }
         }
     }
 }
@@ -1032,6 +1047,7 @@ updatingLocation:(BOOL)updatingLocation
 }
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
+    [readRSSITime setFireDate:[NSDate distantPast]];
     if (error)
     {
         NSLog(@"didDiscoverCharacteristicsForService error : %@", [error localizedDescription]);
@@ -1094,11 +1110,17 @@ updatingLocation:(BOOL)updatingLocation
             NSUserDefaults *defaultsData = [NSUserDefaults standardUserDefaults];
             [defaultsData setObject:self.periperalID forKey:@"periperalID"];
             [self adaptationBle];
+            if (bleSetDone == 0) {
+                UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"绑定设备成功" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+                [alert show];
+                bleSetDone = 1;
+            }
         }
         //车身状态数据
         //ff000002 3203f200 000129
         float h = [UIScreen mainScreen].bounds.size.height;
         if ([[characteristic.value subdataWithRange:NSMakeRange(6, 1)] isEqualToData:[self stringToByte:@"F2"]]) {
+            bleSetDone = 0;
             NSData *carLightData = [characteristic.value subdataWithRange:NSMakeRange(7, 1)];
             if ([carLightData isEqualToData:[self stringToByte:@"00"]]) {
                 //车灯关闭
@@ -1326,6 +1348,25 @@ updatingLocation:(BOOL)updatingLocation
                                                                    forKey:CBConnectPeripheralOptionNotifyOnDisconnectionKey]];
 
 }
+#pragma mark 本地通知
+-(void)notification:(NSString*)string
+{//定义本地通知对象
+    UILocalNotification *notification=[[UILocalNotification alloc]init];
+    //设置调用时间
+    notification.fireDate=[NSDate dateWithTimeIntervalSinceNow:1];//通知触发的时间，10s以后
+    notification.repeatInterval=2;//通知重复次数
+    //notification.repeatCalendar=[NSCalendar currentCalendar];//当前日历，使用前最好设置时区等信息以便能够自动同步时间
+    
+    //设置通知属性
+    notification.alertBody=string; //通知主体
+    notification.applicationIconBadgeNumber=1;//应用程序图标右上角显示的消息数
+    notification.alertAction=@"打开"; //待机界面的滑动动作提示
+    //notification.alertLaunchImage=@"Default";//通过点击通知打开应用时的启动图片,这里使用程序启动图片
+    notification.soundName=UILocalNotificationDefaultSoundName;//收到通知时播放的声音，默认消息声音
+    //调用通知
+    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
