@@ -7,7 +7,7 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>D0FBE481-7953-46EF-ADE9-606A67F3ED62</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>ADLBlue</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>A80FC459891F837FCBACAC0A766DA75AB5E60439</key>
@@ -16,7 +16,7 @@
 		<string>https://github.com/AndiBoyan/ADLBlue.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>ADLBlue.xcodeproj/project.xcworkspace</string>
+	<string>ADLBlue.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>A80FC459891F837FCBACAC0A766DA75AB5E60439</key>

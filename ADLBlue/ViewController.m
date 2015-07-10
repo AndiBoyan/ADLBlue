@@ -48,6 +48,8 @@
     
     NSTimer *readRSSITime;
     NSTimer *tunnelTime;
+    NSTimer *carStateTime;
+    
     float lastlat;
     float lastlon;
     BOOL isTunnel;
@@ -567,10 +569,16 @@ updatingLocation:(BOOL)updatingLocation
         doBtn.frame = CGRectMake(290.5, 240, 40, 30);
     }
     settingViewBackground.frame = CGRectMake(0, 0, settingView.frame.size.width, settingView.frame.size.height);
+    carStateTime = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(readCarState) userInfo:nil repeats:YES];
+    [carStateTime setFireDate:[NSDate distantFuture]];
 }
 
 #pragma mark 控制指令
-
+//心跳
+-(void)readCarState
+{
+    [self periperalCmd:@"F401" length:10];
+}
 //开灯指令
 -(void)obsOnButtonAction:(id)sender
 {
@@ -960,12 +968,7 @@ updatingLocation:(BOOL)updatingLocation
     [_discoveredPeripheral discoverServices:nil];
     
     readRSSITime = [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(detectRSSI) userInfo:nil repeats:YES];
-    /*dispatch_async(dispatch_get_main_queue(), ^{
-        readRSSITime = [NSTimer scheduledTimerWithTimeInterval:2.0
-                                                      target:self
-                                                    selector:@selector(detectRSSI)
-                                                    userInfo:nil
-                                                     repeats:YES];    });*/
+    [carStateTime setFireDate:[NSDate distantPast]];
 
 }
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
