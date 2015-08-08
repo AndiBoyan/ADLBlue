@@ -108,7 +108,7 @@
     AMapPlaceSearchRequest *poiRequest = [[AMapPlaceSearchRequest alloc] init];
     poiRequest.searchType = AMapSearchType_PlaceAround;
     //23.536678 113.311437 23.536678 113.311437
-    poiRequest.location = [AMapGeoPoint locationWithLatitude:23.5390882478 longitude:113.3105027174];
+    poiRequest.location = [AMapGeoPoint locationWithLatitude:lastlat longitude:lastlon];
     poiRequest.radius = 200;
     poiRequest.types = @[@"190310"];
     poiRequest.requireExtension = YES;
